@@ -1,0 +1,203 @@
+// Polynomial multiplication
+#include <iostream>
+using namespace std;
+
+// product = multiplicand * multiplier
+void multiplication( long long int *multiplicandCoef, long long int *multiplicandExpon, int multiplicandSize,
+                    long long int *multiplierCoef, long long int *multiplierExpon, int multiplierSize,
+                    long long int *&productCoef, long long int *&productExpon, int &productSize );
+
+// addend += adder
+void addition( long long int *&addendCoef, long long int *&addendExpon, int &addendSize,
+              long long int *adderCoef, long long int *adderExpon, int adderSize );
+
+// returns true if and only if the specified polynomial is the zero polynomial
+bool isZero( long long int *coefficient, int size );
+
+// outputs the specified polynomial
+void output( long long int *coefficient, long long int *exponent, int size );
+
+int main()
+{
+  int T;
+  cin >> T;
+  for( int t = 0; t < T; t++ )
+  {
+     int multiplicandSize;
+     cin >> multiplicandSize; // input multiplicand
+     long long int *multiplicandCoef = new long long int[ multiplicandSize ]();
+     long long int *multiplicandExpon = new long long int[ multiplicandSize ]();
+     for( int i = multiplicandSize - 1; i >= 0; i-- )
+        cin >> multiplicandCoef[ i ];
+     for( int i = multiplicandSize - 1; i >= 0; i-- )
+        cin >> multiplicandExpon[ i ];
+
+     int multiplierSize;    
+     cin >> multiplierSize; // input multiplier
+     long long int *multiplierCoef = new long long int[ multiplierSize ]();
+     long long int *multiplierExpon = new long long int[ multiplierSize ]();
+     for( int i = multiplierSize - 1; i >= 0; i-- )
+        cin >> multiplierCoef[ i ];
+     for( int i = multiplierSize - 1; i >= 0; i-- )
+        cin >> multiplierExpon[ i ];
+
+     int productSize;
+     long long int *productCoef;
+     long long int *productExpon;
+     // product = multiplicand * multiplier
+     if(multiplicandSize>multiplierSize)
+        multiplication( multiplicandCoef, multiplicandExpon, multiplicandSize,
+                       multiplierCoef, multiplierExpon, multiplierSize,
+                       productCoef, productExpon, productSize );
+     else
+        multiplication( multiplierCoef, multiplierExpon, multiplierSize,
+                       multiplicandCoef, multiplicandExpon, multiplicandSize,
+                       productCoef, productExpon, productSize );
+
+     output( productCoef, productExpon, productSize );
+
+     delete[] multiplicandCoef;
+     delete[] multiplicandExpon;
+     delete[] multiplierCoef;
+     delete[] multiplierExpon;
+     delete[] productCoef;
+     delete[] productExpon;
+  }
+}
+
+// product = multiplicand * multiplier
+void multiplication( long long int *multiplicandCoef, long long int *multiplicandExpon, int multiplicandSize,
+                    long long int *multiplierCoef, long long int *multiplierExpon, int multiplierSize,
+                    long long int *&productCoef, long long int *&productExpon, int &productSize )
+{
+  productSize = multiplicandSize * multiplierSize;
+  productExpon =new long long int [productSize];
+  productCoef = new long long int [productSize];
+
+  for(int i=0; i<productSize; i++)//初始化
+  {
+       productExpon[i]=0;
+       productCoef[i]=0;
+  }
+
+  int bufferSize=multiplicandSize;
+  long long int* bufferExpon = new long long int [bufferSize];
+  long long int* bufferCoef = new long long int [bufferSize];
+
+  for(int i=0; i<bufferSize; i++)//初始化
+  {
+       bufferExpon[i]=0;
+       bufferCoef[i]=0;
+  }
+ 
+  for(int i=0; i<multiplierSize; i++)
+  {
+     for(int j=0; j<multiplicandSize; j++)
+     {
+        bufferExpon[j] = multiplierExpon[i] + multiplicandExpon[j];
+        bufferCoef[j] = multiplierCoef[i] * multiplicandCoef[j];
+        if(i==0)//第一次直接放進去
+        {
+           productExpon[j]=bufferExpon[j];
+           productCoef[j]=bufferCoef[j];
+        }
+       
+     }
+     if(i!=0)
+        addition(productCoef, productExpon, productSize,
+                 bufferCoef, bufferExpon, bufferSize);
+  }
+ 
+
+  int temp=0;
+  for(int k=0; k<productSize; k++)//把係數為0的項左移
+  {
+     if(productCoef[k]!=0)
+     {
+        productExpon[temp]=productExpon[k];
+        productCoef[temp]=productCoef[k];
+        if(k!=temp)
+        {
+           productExpon[k]=0;
+           productCoef[k]=0;
+        }
+        temp++;
+     }
+  }
+
+  for(int k=0; k<productSize; k++)//刪除係數為0的項
+  {
+     if(productCoef[k]==0)
+     {
+        productSize=k;
+        break;
+     }
+  }
+
+  if(isZero(multiplicandCoef, multiplicandSize) || isZero(multiplierCoef, multiplierSize))
+     productSize=1;
+
+  delete[] bufferCoef;
+  delete[] bufferExpon;
+}
+
+// addend += adder
+void addition( long long int *&addendCoef, long long int *&addendExpon, int &addendSize,
+              long long int *adderCoef, long long int *adderExpon, int adderSize )
+{
+  for(int i=0; i<adderSize; i++)
+  {
+     int flag=0;
+     for(int j=0; j<addendSize; j++)
+        if(adderExpon[i]==addendExpon[j])
+        {
+           addendCoef[j] += adderCoef[i];
+           flag=1;
+           break;
+        }
+     if(!flag)//沒同次方的
+     {
+        for(int j=0; j<addendSize; j++)
+        {
+           if(addendCoef[j]==0)//放入空格
+           {
+              addendExpon[j]=adderExpon[i];
+              addendCoef[j]=adderCoef[i];
+              break;
+           }
+        }
+     }
+  }
+  for(int k=0; k<addendSize; k++)//依次方排序
+  {
+     for(int l=k+1; l<addendSize; l++)
+     {
+        if(addendExpon[k]>addendExpon[l])
+        {
+           swap(addendCoef[k], addendCoef[l]);
+           swap(addendExpon[k], addendExpon[l]);
+        }
+     }
+  }
+}
+
+// returns true if and only if the specified polynomial is the zero polynomial
+bool isZero( long long int *coefficient, int size )
+{
+  return ( size == 1 && coefficient[ 0 ] == 0 );
+}
+
+// outputs the specified polynomial
+void output( long long int *coefficient, long long int *exponent, int size )
+{
+  cout << size << endl;
+  cout << coefficient[ size - 1 ];
+  for( int i = size - 2; i >= 0; i-- )
+     cout << " " << coefficient[ i ];
+  cout << endl;
+
+  cout << exponent[ size - 1 ];
+  for( int i = size - 2; i >= 0; i-- )
+     cout << " " << exponent[ i ];
+  cout << endl;
+}
