@@ -1,2 +1,2 @@
-# yzu-Computer-Programming(I)
+# yzu_Computer Programming(I)
 homework code
