@@ -1,0 +1,62 @@
+#include <iostream>
+#include <cstring>
+#include <vector>
+using namespace::std;
+
+// sum = addend + adder
+vector< int > addition( vector< int > addend, vector< int > adder );
+
+int main()
+{
+   char strA[ 251 ], strB[ 251 ];
+   int T;
+   cin >> T;
+   for( int t = 0; t < T; ++t )
+   {
+      cin >> strA >> strB;
+
+      int addendSize = strlen( strA );
+      vector< int > addend( addendSize );
+      for( int i = 0; i < addendSize; ++i )
+         addend[ i ] = strA[ addendSize - 1 - i ] - '0';
+
+      int adderSize = strlen( strB );
+      vector< int > adder( adderSize );
+      for( int i = 0; i < adderSize; ++i )
+         adder[ i ] = strB[ adderSize - 1 - i ] - '0';
+
+      vector< int > sum = addition( addend, adder );
+
+      for( int i = sum.size() - 1; i >= 0; i-- )
+         cout << sum[ i ];
+      cout << endl;
+   }
+}
+
+// sum = addend + adder
+vector< int > addition( vector< int > addend, vector< int > adder )
+{
+    int sumSize = max(addend.size(), adder.size()) +1;
+    vector<int> sum(sumSize);
+    int i;
+    for(i=0; i<min(addend.size(), adder.size()); i++)
+        sum[i] = addend[i] + adder[i];
+
+    if(addend.size() > adder.size())
+        for(; i<addend.size(); i++)
+            sum[i] = addend[i];
+    else if(addend.size() < adder.size())
+        for(; i<adder.size(); i++)
+            sum[i] = adder[i];
+
+    for(int j=0; j<sumSize-1; j++)
+    {
+        sum[j+1] += sum[j]/10;
+        sum[j] %= 10;
+    }
+
+    if(sum[sumSize-1] == 0)
+        sum.pop_back();
+    
+    return sum;
+}
