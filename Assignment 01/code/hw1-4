@@ -1,0 +1,14 @@
+#include<iostream>
+using namespace std;
+int main(){
+    int num=0, n[5]={};
+    cin >> num;
+    n[0]=num/10000;
+    n[1]=(num/1000)%10;
+    n[3]=(num/10)%10;
+    n[4]=num%10;
+    if(n[0]==n[4] && n[1]==n[3])
+        cout << "palindrome\n";
+    else
+        cout << "non-palindrome\n";
+}
