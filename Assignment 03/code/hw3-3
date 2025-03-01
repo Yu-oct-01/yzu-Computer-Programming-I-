@@ -1,0 +1,78 @@
+#include <iostream>
+using namespace std;
+
+void division( int dividend[], int divisor[], int quotient[], int remainder[],
+   int dividendDegree, int divisorDegree, int &quotientDegree, int &remainderDegree);
+
+const int arraySize = 101;
+
+int main()
+{
+   int T;
+   cin >> T;
+   for( int t = 0; t < T; t++ )
+   {
+      int dividend[ arraySize ]={};
+      int dividendDegree=0;
+      cin >> dividendDegree;
+      for( int i = dividendDegree; i >= 0; i-- )
+         cin >> dividend[ i ];
+
+      int divisor[ arraySize ]={};
+      int divisorDegree=0;
+      cin >> divisorDegree;
+      for( int i = divisorDegree; i >= 0; i-- )
+         cin >> divisor[ i ];
+
+      int quotient[ arraySize ]={};
+      int remainder[ arraySize ]={};
+      int quotientDegree=0;
+      int remainderDegree=0;
+      division( dividend, divisor, quotient, remainder,
+         dividendDegree, divisorDegree, quotientDegree, remainderDegree );
+
+      cout << quotientDegree;
+      for( int i = quotientDegree; i >= 0; i-- )
+         cout << " " << quotient[ i ];
+      cout << endl;
+
+      cout << remainderDegree;
+      for( int i = remainderDegree; i >= 0; i-- )
+         cout << " " << remainder[ i ];
+      cout << endl;
+   }
+}
+
+void division( int a[], int b[], int q[], int r[],
+   int ad, int bd, int &qd, int &rd)
+{
+   int temp=ad;
+   while(abs(a[temp])< abs(b[bd]))
+      temp--;
+   int n=temp;
+   qd=temp-bd;//如果係數為0不算
+   for(int i=qd; i>=0; i--)
+   {
+      q[i]=a[n]/b[bd];
+      int x=n;
+      for(int j=0; j<=bd; j++)
+      {
+         a[x] -= q[i]*b[bd-j];
+         x--;
+      }
+      n--;
+   }
+
+   qd=ad-bd;//真正的次數
+   for(int i=qd; i>temp-bd; i--)
+      q[i]=0;
+
+   for(int i=ad; i>=0; i--)
+      if(a[i]!=0)
+      {
+         rd=i;
+         break;
+      }
+   for(int i=rd; i>=0; i--)
+      r[i]=a[i];
+}
